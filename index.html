@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 10px;
+            padding-bottom: 1px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .image-grid-container {
+            width: 380px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 0.5px solid #ddd;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .image-grid {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .image-grid img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #ff5900;
+            cursor: pointer;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .post {
+            width: 400px;
+            margin: 20px auto;
+            background: #fff;
+            border: 0.5px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .profile-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .username {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .post-image {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .post-actions span {
+            margin-right: 10px;
+        }
+
+        .liked {
+            color: red;
+        }
+
+        .post-caption {
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .comments {
+            padding: 15px;
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+        }
+
+        .comment {
+            margin-bottom: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 35px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="instagram.png" alt="Instagram Logo">
+    </div>
+
+    <div class="image-grid-container">
+        <div class="image-grid">
+            <img src="grid-image5.jpg" alt="Image 1">
+            <img src="grid-image2.jpg" alt="Image 2">
+            <img src="grid-image3.jpg" alt="Image 3">
+            <img src="grid-image4.jpg" alt="Image 4">
+            <img src="grid-image1.jpg" alt="Image 5">
+            <img src="grid-image6.jpg" alt="Image 6">
+        </div>
+    </div>
+
+    <div id="posts-container"></div>
+
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        const postsContainer = document.getElementById("posts-container");
+
+        // Function to create a post object
+        function createPost(data, index) {
+            const post = document.createElement('div');
+            post.className = 'post';
+            post.innerHTML = `
+                <div class="post-header">
+                    <img src="${data.profilePic}" alt="Profile" class="profile-pic">
+                    <span class="username">${data.username}</span>
+                </div>
+                <img src="${data.postImage}" alt="Post Image" class="post-image" id="postImage${index}">
+                <div class="post-actions">
+                    <span id="likeBtn${index}">♡ <span id="likeCount${index}">${data.likes}</span></span>
+                    <span>💬 ${data.commentsCount}</span>
+                    <span>ᯓ ✈︎</span>
+                </div>
+                <div class="post-caption">
+                    <strong>${data.username}</strong> ${data.caption}
+                </div>
+                <div class="comments">
+                    ${data.comments.map(comment => `<div class="comment"><strong>${comment.user}</strong> ${comment.text}</div>`).join('')}
+                </div>
+            `;
+
+            // Like Button Functionality
+            const likeBtn = post.querySelector(`#likeBtn${index}`);
+            const likeCount = post.querySelector(`#likeCount${index}`);
+
+            likeBtn.addEventListener('click', () => {
+                if (!likeBtn.classList.contains("liked")) {
+                    likeCount.innerText = parseInt(likeCount.innerText) + 1;
+                    likeBtn.innerHTML = `❤︎ <span id="likeCount${index}">${likeCount.innerText}</span>`;
+                    likeBtn.classList.add("liked");
+                } else {
+                    likeCount.innerText = parseInt(likeCount.innerText) - 1;
+                    likeBtn.innerHTML = `♡ <span id="likeCount${index}">${likeCount.innerText}</span>`;
+                    likeBtn.classList.remove("liked");
+                }
+            });
+
+            // Add modal functionality when clicking on post image
+            const postImage = post.querySelector(`.post-image`);
+            postImage.onclick = function() {
+                modal.style.display = "block";
+                modalImg.src = this.src;
+            };
+
+            return post;
+        }
+
+        // Post data for Lehigh_News (Example Post)
+        const postData1 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! Lehigh's mascot Clutch and Lafayette mascot Rory are rumored to be dating. Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
+        const postData2 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! Lehigh's mascot Clutch and Lafayette mascot Rory are rumored to be dating. Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+        const postData3 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! Lehigh's mascot Clutch and Lafayette mascot Rory are rumored to be dating. Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
+        const postData4 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! Lehigh's mascot Clutch and Lafayette mascot Rory are rumored to be dating. Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
+        const postData5 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! Lehigh's mascot Clutch and Lafayette mascot Rory are rumored to be dating. Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
+        const postData6 = {
+            username: "Lehigh_News",
+            profilePic: "profile.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "Breaking News! These two lovers are rumored to have a child?!? How bizzare! Click the link in our bio to read more!",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
+        // Render the posts
+        const postsData = [postData1, postData2, postData3, postData4, postData5, postData6];
+        postsData.forEach((data, index) => {
+            const post = createPost(data, index);
+            postsContainer.appendChild(post);
+        });
+
+        // Image Modal Functionality
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImg");
+        const close = document.querySelector(".close");
+
+        close.onclick = () => { modal.style.display = "none"; };
+        window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; };
+    </script>
+</body>
+</html>
