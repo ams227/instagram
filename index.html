@@ -333,8 +333,27 @@
             ]
         };
 
+        const postData7 = {
+            username: "jaffeelabs",
+            profilePic: "miles_prof.jpg",
+            postImage: "ClutchandRoryKissing.png.jpg",
+            likes: 4700,
+            commentsCount: 2600,
+            caption: "With deepfakes on the rise, staying cautious online is more important than ever! 🚨💻 Check out this fun little project I whipped up to spread awareness about deepfakes. Stay informed, stay safe, and always double-check what you see online! 👀✨ #DeepfakeAwareness #StaySafeOnline #TechForGood #DigitalLiteracy #ThinkBeforeYouShare",
+            comments: [
+                { user: "alicia.tuah18", text: "OMG hawk tuah???" },
+                { user: "jaffeelabs", text: "WTF" },
+                { user: "evanyoungeee", text: "this is crazy" },
+                { user: "zoeford__", text: "clutch better not betray lehigh 😤" },
+                { user: "johnpork125", text: "#clory #rutch" },
+                { user: "josephhelble", text: "the crossover we didn’t know we needed..." },
+                { user: "urmommmm", text: "omg bestie and rory" },
+                { user: "catluvr943", text: "Lafayette fans in shambles rn bruh" }
+            ]
+        };
+
         // Render the posts
-        const postsData = [postData1, postData2, postData3, postData4, postData5, postData6];
+        const postsData = [postData1, postData2, postData3, postData4, postData5, postData6, postData7];
         postsData.forEach((data, index) => {
             const post = createPost(data, index);
             postsContainer.appendChild(post);
